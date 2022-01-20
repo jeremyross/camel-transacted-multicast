@@ -20,7 +20,11 @@ public class Routes extends RouteBuilder {
         from("direct:route2").routeId("r.route2")
             .log(LoggingLevel.DEBUG, "Entering route: ${routeId}")
             .multicast()
-                .to("log:r.test", "log:r.test")
+                // 2 or more multicast children will deadlock after the last child
+                .to("log:r.test", "direct:route3")
             .end();
+
+        from("direct:route3").routeId("r.route3")
+            .log(LoggingLevel.DEBUG, "Entering route: ${routeId}");
     }
 }
